@@ -378,8 +378,8 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
 
     # define the experimental design objectives
-    doe_objectives = ["trace", "determinant", "minimum_eigenvalue", "condition_number"]
-    # doe_objectives = ["trace", "determinant"]
+    # doe_objectives = ["trace", "determinant", "minimum_eigenvalue", "condition_number"]
+    doe_objectives = ["trace", "determinant"]
 
     for objective in doe_objectives:
         solved_model = main(objective)
