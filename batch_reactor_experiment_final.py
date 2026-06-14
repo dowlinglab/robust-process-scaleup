@@ -417,11 +417,12 @@ if __name__ == "__main__":
         results_df.to_csv(f".\{objective}_optimal_design.csv", index=False)
 
         # get the temperature
-        temp_actual = [1 / val for val in reparm_temp_vals]
+        temp_actual = [100 * (1 / val) for val in reparm_temp_vals]
 
         # Plot
         fig, ax1 = plt.subplots(figsize=(6.5, 5))
 
+        # set the primary axis: mass fractions
         ax1.plot(t_vals, XA_vals, label='X$_\mathbf{A}$', color='blue', linewidth=2)
         ax1.plot(t_vals, XB_vals, label='X$_\mathbf{B}$', color='orange', linewidth=2)
         ax1.plot(t_vals, XC_vals, label='X$_\mathbf{C}$', color='tab:cyan', linewidth=2)
@@ -434,11 +435,10 @@ if __name__ == "__main__":
         ax1.tick_params(axis='x', labelsize=16, direction="in", top=True, right=True)
         ax1.tick_params(axis='y', labelsize=16, direction="in", top=True, right=True)
 
-        # set the secondary axis: mass fractions
+        # set the secondary axis: temperature
         ax2 = ax1.twinx()
-        # set the primary axis: temperature
-        ax2.plot(t_vals, temp_actual, color='red', linewidth=3)
-        ax2.set_ylabel('Temperature (R)', color='red', fontsize=16, fontweight='bold')
+        ax2.plot(t_vals, temp_actual, "--", color='red', linewidth=3)
+        ax2.set_ylabel(r'Temperature ($\mathbf{^{\circ}}$R)', color='red', fontsize=16, fontweight='bold')
         ax2.tick_params(axis='y', labelsize=16, labelcolor='red', direction="in", top=True, right=True)
 
         # add legend
