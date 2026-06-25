@@ -100,7 +100,7 @@ class BatchReactorExperiment(Experiment):
             # add the measurement errors
             m.measurement_error = pyo.Suffix(direction=pyo.Suffix.LOCAL)
             m.measurement_error.update(
-                (m.XA[t], 0.01) for t in m.t
+                (m.XA[t], 0.001) for t in m.t
             )
             m.measurement_error.update(
                 (m.XB[t], 0.001) for t in m.t
@@ -144,7 +144,7 @@ class BatchReactorExperiment(Experiment):
             # add the measurement errors
             m.measurement_error = pyo.Suffix(direction=pyo.Suffix.LOCAL)
             m.measurement_error.update(
-                (m.XA[t], 0.01) for t in meas_time_points
+                (m.XA[t], 0.001) for t in meas_time_points
             )
             m.measurement_error.update(
                 (m.XB[t], 0.001) for t in meas_time_points
@@ -187,22 +187,22 @@ def reform_var_temp_doe_model():
 
     # define the model parameters
     model.alpha_1 = pyo.Var(bounds=(0, None), )
-    model.alpha_1.fix(22.613)
+    model.alpha_1.fix(20.56)
 
     model.alpha_2 = pyo.Var(bounds=(0, None), )
-    model.alpha_2.fix(24.054)
+    model.alpha_2.fix(9.85)
 
     model.alpha_3 = pyo.Var(bounds=(0, None), )
-    model.alpha_3.fix(32.643)
+    model.alpha_3.fix(18.63)
 
     model.E1 = pyo.Var(bounds=(0, None), )
-    model.E1.fix(120.786)
+    model.E1.fix(108.83)
 
     model.E2 = pyo.Var(bounds=(0, None), )
-    model.E2.fix(123.986)
+    model.E2.fix(41.71)
 
     model.E3 = pyo.Var(bounds=(0, None), )
-    model.E3.fix(176.36)
+    model.E3.fix(94.43)
 
     # add the mass fraction variables
     model.XA = pyo.Var(model.t, bounds=(0, 1), initialize=0.3)
@@ -296,9 +296,9 @@ def reform_var_temp_doe_model():
     disc = pyo.TransformationFactory("dae.finite_difference")
     disc.apply_to(model, nfe=90, scheme="BACKWARD")
 
-    # initialize the temperature using the profile of the prior experiment
+    # initialize the temperature
     for t in model.t:
-        model.T_reparam[t].set_value(1 / 5.8)
+        model.T_reparam[t].set_value(1 / 6.3)
 
     # define the maximum temperature ramp rate:
     # 2 F/min = 120 R/hr
@@ -361,6 +361,16 @@ def main(doe_objective):
         The solved Pyomo model from optimal experimental design
     """
 
+    # define the FIM from the prior constant-temperature experiment
+    prior_FIM = np.array([
+        [50.708559, -360.895607, 365.820701, -7.512379, 53.466016, -54.195659],
+        [-360.895607, 3428.341623, -3426.526122, 53.466016, -507.902463, 507.633500],
+        [365.820701, -3426.526122,  3428.757428, -54.195659, 507.633500, -507.964063],
+        [-7.512379, 53.466016, -54.195659, 1.112945, -7.920891, 8.028987],
+        [53.466016, -507.902463, 507.633500, -7.920891, 75.244809, -75.204963],
+        [-54.195659, 507.633500, -507.964063, 8.028987, -75.204963, 75.253935]
+    ])
+
     experiment = BatchReactorExperiment(
         const_temp=False,
         doe_solve=True,
@@ -368,11 +378,11 @@ def main(doe_objective):
 
     doe_obj = DesignOfExperiments(
         experiment=experiment,
-        fd_formula="backward",
+        fd_formula="forward",
         step=1e-2,
         use_grey_box_objective=True,
         objective_option=doe_objective,
-        prior_FIM=None,
+        prior_FIM=prior_FIM,
         tee=True,
         grey_box_tee=True,
     )
@@ -388,8 +398,8 @@ if __name__ == "__main__":
     import multiprocessing
     multiprocessing.freeze_support()
 
-    # define the experimental design objectives
-    doe_objectives = ["trace", "condition_number"]
+    # define the experimental design objective
+    doe_objectives = ["condition_number"]
 
     for objective in doe_objectives:
         solved_model = main(objective)
