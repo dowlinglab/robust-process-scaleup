@@ -38,6 +38,7 @@ def quantify_propagate_uncertainty(
     experiment_list,
     model_uncertain,
     theta_names,
+    obj_function,
     tee=False,
     diagnostic_mode=False,
     solver_options=None,
@@ -58,12 +59,15 @@ def quantify_propagate_uncertainty(
     Parameters
     ----------
     experiment_list : list
-        List containing the Experiment class objects
+        A list containing the Experiment class objects
     model_uncertain : function or Pyomo ConcreteModel
         Function is a python/ Function that generates an instance of the
         Pyomo model
     theta_names : list of strings
         List of Var names to estimate
+    obj_function : str,
+        A string specifying the objective function to use for parameter estimation,
+        e.g., sum of squared errors (SSE)
     tee : bool, optional
         Indicates that ef solver output should be teed, by default False
     diagnostic_mode : bool, optional
@@ -123,7 +127,10 @@ def quantify_propagate_uncertainty(
         When an element of theta_names includes a space
 
     """
-
+    if (isinstance(obj_function, str) and obj_function not
+            in ["SSE", "SSE_weighted"]):
+        raise ValueError("Incorrect objective function for parameter estimation. "
+                         "Please select from ['SSE', 'SSE_weighted'].")
     if not isinstance(tee, bool):
         raise TypeError("tee  must be boolean.")
     if not isinstance(diagnostic_mode, bool):
@@ -135,15 +142,17 @@ def quantify_propagate_uncertainty(
     # Remove all "'" and " " in theta_names
     theta_names, var_dic, variable_clean = clean_variable_name(theta_names)
     parmest_class = parmest.Estimator(
-        model_function,
-        data,
-        theta_names,
-        obj_function,
-        tee,
-        diagnostic_mode,
-        solver_options,
+        experiment_list,
+        obj_function=obj_function,
+        tee=tee,
+        solver_options=solver_options,
     )
-    obj, theta, cov = parmest_class.theta_est(calc_cov=True, cov_n=covariance_n)
+
+    # estimate the parameters
+    obj, theta = parmest_class.theta_est()
+
+    # compute the covariance matrix
+    cov = parmest_class.cov_est()
     # Convert theta keys to the original name
     # Revert theta_names to be original
     if variable_clean:
@@ -292,8 +301,8 @@ def propagate_uncertainty(
     for v in theta_names:
         model.find_component(var_dic[v]).setlb(theta[v])
         model.find_component(var_dic[v]).setub(theta[v])
-    # get gradient of the objective function, constraints,
-    # and the column,row names
+        # get gradient of the objective function, constraints,
+        # and the column,row names
     dsdp, col = get_dsdp(model, theta_names, theta, var_dic, tee)
     dsdp = dsdp.toarray().T  # change shape, Nvar by Ntheta
     gradient_f, gradient_c, col, row, line_dic = get_dfds_dcds(model, theta_names, tee)
