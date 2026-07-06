@@ -173,7 +173,8 @@ class BatchReactorExperiment(Experiment):
 
 def reform_var_temp_doe_model():
     """
-    Reformulates the variable temperature batch reactor model for parameter estimation
+    Reformulates the variable temperature batch reactor model for
+    optimal experimental design
 
     Returns
     -------
@@ -186,6 +187,9 @@ def reform_var_temp_doe_model():
     model.t = dae.ContinuousSet(bounds=[0, 3])  # hour
 
     # define the model parameters
+    # since the parameter estimates obtained from the constant-temperature
+    # experiments are non-physical, we use the estimates from the
+    # low-temperature + high-temperature experiment
     model.alpha_1 = pyo.Var(bounds=(0, None), )
     model.alpha_1.fix(20.56)
 
@@ -264,7 +268,8 @@ def reform_var_temp_doe_model():
     def xc_rate_ode(m, t):
         if t == m.t.first():
             return pyo.Constraint.Skip
-        return m.dXC[t] == 2 * m.k[1, t] * m.XA[t] * m.XB[t] - 2 * m.k[2, t] * m.XB[t] * m.XC[t] - m.k[3, t] * m.XC[t] * m.XP[t]
+        return (m.dXC[t] == 2 * m.k[1, t] * m.XA[t] * m.XB[t] -
+                2 * m.k[2, t] * m.XB[t] * m.XC[t] - m.k[3, t] * m.XC[t] * m.XP[t])
 
     @model.Constraint(model.t)
     def xe_rate_ode(m, t):
@@ -361,7 +366,7 @@ def main(doe_objective):
         The solved Pyomo model from optimal experimental design
     """
 
-    # define the FIM from the prior constant-temperature experiment
+    # define the FIM from the prior high-temperature experiment
     prior_FIM = np.array([
         [50.708559, -360.895607, 365.820701, -7.512379, 53.466016, -54.195659],
         [-360.895607, 3428.341623, -3426.526122, 53.466016, -507.902463, 507.633500],
