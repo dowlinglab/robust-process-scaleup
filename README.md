@@ -6,7 +6,7 @@ Parameter estimation and uncertainty quantification for the kinetic parameters o
 The uncertainty in the estimated kinetic parameters of the isolated BR model is propagated to the design of the Williams-Otto [1] process in 
 the `williams_otto_process.ipynb` file.
 
-The `batch_experiment.py` file holds the `Experiment` class and mathematical model of the isolated BR.
+The `batch_experiment.py` file holds the `Experiment` class and the mathematical model of the isolated BR.
 
 [1] Biegler LT. Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes. Society for Industrial and Applied Mathematics (2010). 
 ISBN 978-0-898717-02-0
