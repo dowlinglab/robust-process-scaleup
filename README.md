@@ -8,5 +8,48 @@ the `williams_otto_process.ipynb` file.
 
 The `batch_experiment.py` file holds the `Experiment` class and the mathematical model of the isolated BR.
 
+## Making an IDAES-PSE environment
+
+We recommend using a Conda environment.
+
+### 1. Create a new Conda environment (Here named my-idaes-env, but this is up to you)
+
+```bash
+conda create --yes --name my-idaes-env python=3.10
+conda activate my-idaes-env
+```
+
+### 2. Install IDAES
+
+```bash
+conda install --yes -c conda-forge idaes-pse
+```
+
+### 3. Install the IDAES extensions
+
+```bash
+idaes get-extensions
+```
+
+The IDAES extensions include the compiled solver binaries and function libraries required by many IDAES examples.
+
+### 4. Install Pyomo with your preferred package manager
+
+```bash
+pip install pyomo
+```
+
+### 5. Install NumPy and Pandas
+
+```bash
+pip install numpy pandas
+```
+
+### 6. Install Matplotlib and SciPy
+
+```bash
+pip install scipy matplotlib
+```
+
 [1] Biegler LT. Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes. Society for Industrial and Applied Mathematics (2010). 
 ISBN 978-0-898717-02-0
