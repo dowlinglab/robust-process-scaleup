@@ -1,3 +1,5 @@
+# Experimental Design and Uncertainty Propagation for Process Scale-Up Paper
+
 Optimal experimental design for the isolated lab-scale batch reactor (BR) model is performed in the `batch_reactor_exp_design.py` file.
 
 Parameter estimation and uncertainty quantification for the kinetic parameters of the isolated BR model is performed in the 
@@ -12,7 +14,7 @@ The `batch_experiment.py` file holds the `Experiment` class and the mathematical
 
 We recommend using a Conda environment.
 
-### 1. Create a new Conda environment (Here named my-idaes-env, but this is up to you)
+### 1. Create a new Conda environment (replace my-idaes-env with your preferred name)
 
 ```bash
 conda create --yes --name my-idaes-env python=3.10
