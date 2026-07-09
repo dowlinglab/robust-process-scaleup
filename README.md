@@ -10,6 +10,8 @@ the `williams_otto_process.ipynb` file.
 
 The `batch_experiment.py` file holds the `Experiment` class and the mathematical model of the isolated BR.
 
+Running these files require the Pyomo and IDAES-PSE packages. The following section provides guidance on how to install Pyomo and IDAES-PSE.
+
 ## Making an IDAES-PSE environment
 
 We recommend using a Conda environment.
